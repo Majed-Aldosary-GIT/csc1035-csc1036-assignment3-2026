@@ -4,57 +4,56 @@ import physicalwellbeingtracker.buildingblockdata.Activity;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class PhysicalActivityRecordList {
-    private List<PhysicalActivityRecord> records;
 
+    private final List<PhysicalActivityRecord> recordedPhysicalActivities;
 
     public PhysicalActivityRecordList() {
-        // initially no physical activity
-        records = new ArrayList<>;
+        recordedPhysicalActivities = new ArrayList<>();
     }
 
-    // add a physical activity to the existing list of physical activities.
-    public void addPhysicalActivity(PhysicalActivityRecord physicalActivityRecord) {
-        records.add(physicalActivityRecord);
+    public void addPhysicalActivity(PhysicalActivityRecord record) {
+        recordedPhysicalActivities.add(record);
     }
 
-    // Edit a physical activity.
-    public void replacePhysicalActivity(PhysicalActivityRecord oldRecord, PhysicalActivityRecord newRecord) {
-        int idx = records.indexOf(oldRecord);
-        if (idx != -1) {
-            records.set(idx, newRecord);
+    public void removePhysicalActivity(int index) {
+        recordedPhysicalActivities.remove(index);
+    }
+
+    public void deletePhysicalActivity(PhysicalActivityRecord record) {
+        recordedPhysicalActivities.remove(record);
+    }
+
+    public void replacePhysicalActivity(
+            PhysicalActivityRecord oldRecord,
+            PhysicalActivityRecord newRecord) {
+
+        int index = recordedPhysicalActivities.indexOf(oldRecord);
+
+        if (index != -1) {
+            recordedPhysicalActivities.set(index, newRecord);
         }
     }
 
-
-    // Delete a physical activity
-    public void deletePhysicalActivity(PhysicalActivityRecord physicalActivityRecord) {
-        records.remove(physicalActivityRecord);
-    }
-
-    // Clear all physical activities
-    public void clearPhysicalActivities() {
-        records.clear();
-    }
-
-
-    // return the entire list of physical activities added so far
-    // implement list as ArrayList
     public List<PhysicalActivityRecord> getAllPhysicalActivities() {
-        return new ArrayList<>(records);
+        return recordedPhysicalActivities;
     }
 
-
-    // get the physical activities based on activity type for filter panel
     public List<PhysicalActivityRecord> getRecordedPhysicalActivitiesByActivity(Activity activity) {
-        return records.stream()
-                .filter(physicalActivity -> physicalActivity.activity().equals(activity))
-                .collect(Collectors.toList());
+
+        List<PhysicalActivityRecord> filteredActivities = new ArrayList<>();
+
+        for (PhysicalActivityRecord record : recordedPhysicalActivities) {
+            if (record.activity() == activity) {
+                filteredActivities.add(record);
+            }
+        }
+
+        return filteredActivities;
     }
 
-
-
-
+    public void clearAll() {
+        recordedPhysicalActivities.clear();
+    }
 }

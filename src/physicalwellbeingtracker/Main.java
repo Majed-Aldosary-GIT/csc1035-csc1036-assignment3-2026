@@ -1,9 +1,8 @@
 package physicalwellbeingtracker;
 
 import physicalwellbeingtracker.buildingblockdata.*;
-import physicalwellbeingtracker.physicalactivitydata.PhysicalActivityRecord;
 import physicalwellbeingtracker.gui.*;
-import physicalwellbeingtracker.physicalactivitydata.PhysicalActivityRecordList;
+import physicalwellbeingtracker.physicalactivitydata.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -16,15 +15,20 @@ public class Main {
     }
 
     private static void createAndShowGUI() {
+
         JFrame frame = new JFrame("Physical Well-being Activity Tracker");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLayout(new BorderLayout());
 
-        PhysicalActivityRecordList physicalActivityRecordList = new PhysicalActivityRecordList();
+        PhysicalActivityRecordList physicalActivityRecordList =
+                new PhysicalActivityRecordList();
 
         UserInputPanel userInputPanel = new UserInputPanel();
         UserOperationPanel userOperationPanel = new UserOperationPanel();
-        PhysicalActivityRecordListTablePanel physicalActivityRecordListTablePanel = new PhysicalActivityRecordListTablePanel(physicalActivityRecordList);
+
+        PhysicalActivityRecordListTablePanel physicalActivityRecordListTablePanel =
+                new PhysicalActivityRecordListTablePanel(physicalActivityRecordList);
+
         FilterAndResetPanel filterAndResetPanel = new FilterAndResetPanel();
 
         JPanel containerPanel = new JPanel();
@@ -39,74 +43,88 @@ public class Main {
 
         frame.pack();
         frame.setLocationRelativeTo(null);
-        frame.setVisible(false);
+        frame.setVisible(true);
 
-        // Save
         userOperationPanel.getSaveButton().addActionListener(e -> {
-            Duration duration = userInputPanel.getDuration();
+
+            double duration = userInputPanel.getDuration();
+
             if (duration <= 0) {
                 JOptionPane.showMessageDialog(
                         userInputPanel,
                         "Duration must be greater than zero.",
                         "Invalid Duration",
-                        JOptionPane.ERROR_MESSAGE
-                );
+                        JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
-            Activity activity = userInputPanel.getActivity();
-            Intensity intensity = userInputPanel.getIntensity();
-            LocalDate date = userInputPanel.getDate();
+            PhysicalActivityRecord record =
+                    new PhysicalActivityRecord(
+                            duration,
+                            userInputPanel.getActivity(),
+                            userInputPanel.getIntensity(),
+                            userInputPanel.getDate());
 
-            PhysicalActivityRecord newPhysicalActivityRecord = new PhysicalActivityRecord(duration, activity, intensity, date);
-            physicalActivityRecordList.addPhysicalActivity(newPhysicalActivityRecord);
+            physicalActivityRecordList.addPhysicalActivity(record);
             physicalActivityRecordListTablePanel.refreshTable();
         });
 
-        EditDialog editDialog =
-                new EditDialog(frame);
-
-        // Edit
-        userOperationPanel.getEditButton().addActionListener(e -> {
-            PhysicalActivityRecord selected = physicalActivityRecordListTablePanel.getSelectedPhysicalActivityRecord();
-            if (selected == null) return;
-
-            boolean saved = editDialog.showDialog(selected);
-            if (!saved) return;
-
-            PhysicalActivityRecord edited = editDialog.getEditedSinglePhysicalActivity();
-            if (edited == null) return;
-
-            physicalActivityRecordList.replacePhysicalActivity(selected, selected);
-            physicalActivityRecordListTablePanel.refreshTable();
-        });
-
-        // Delete
         userOperationPanel.getDeleteButton().addActionListener(e -> {
-            PhysicalActivityRecord selected = physicalActivityRecordListTablePanel.getSelectedPhysicalActivityRecord();
-            if (selected == null) return;
 
-            physicalActivityRecordList.deletePhysicalActivity(selected);
-            physicalActivityRecordListTablePanel.refreshTable();
+            PhysicalActivityRecord selectedRecord =
+                    physicalActivityRecordListTablePanel.getSelectedPhysicalActivityRecord();
+
+            if (selectedRecord != null) {
+                physicalActivityRecordList.deletePhysicalActivity(selectedRecord);
+                physicalActivityRecordListTablePanel.refreshTable();
+            }
         });
 
-        // Clear (also clears filter)
         userOperationPanel.getClearButton().addActionListener(e -> {
-            clearPhysicalActivities();
-            physicalActivityRecordListTablePanel.clearFilter();
+            physicalActivityRecordList.clearAll();
             physicalActivityRecordListTablePanel.refreshTable();
         });
 
-        // Filter
+        userOperationPanel.getEditButton().addActionListener(e -> {
+
+            PhysicalActivityRecord selectedRecord =
+                    physicalActivityRecordListTablePanel.getSelectedPhysicalActivityRecord();
+
+            if (selectedRecord == null) {
+                JOptionPane.showMessageDialog(
+                        frame,
+                        "Please select a record to edit.",
+                        "No Record Selected",
+                        JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            PhysicalActivityRecord editedRecord =
+                    new PhysicalActivityRecord(
+                            userInputPanel.getDuration(),
+                            userInputPanel.getActivity(),
+                            userInputPanel.getIntensity(),
+                            userInputPanel.getDate());
+
+            physicalActivityRecordList.replacePhysicalActivity(
+                    selectedRecord,
+                    editedRecord);
+
+            physicalActivityRecordListTablePanel.refreshTable();
+        });
+
         filterAndResetPanel.getFilterButton().addActionListener(e -> {
-            Activity selectedActivity = (Activity) filterAndResetPanel.getFilterComboBox().getSelectedItem();
+
+            Activity selectedActivity =
+                    (Activity) filterAndResetPanel
+                            .getFilterComboBox()
+                            .getSelectedItem();
+
             physicalActivityRecordListTablePanel.setFilter(selectedActivity);
-            physicalActivityRecordListTablePanel.refreshTable();
         });
 
-        // Show All
         filterAndResetPanel.getShowAllButton().addActionListener(e -> {
-            physicalActivityRecordListTablePanel.refreshTable();
+            physicalActivityRecordListTablePanel.clearFilter();
         });
     }
 }

@@ -7,12 +7,11 @@ import java.awt.*;
 
 public class FilterAndResetPanel extends JPanel {
 
+    private final JComboBox<Activity> filterComboBox;
+    private final JButton filterButton;
+    private final JButton showAllButton;
 
     public FilterAndResetPanel() {
-
-        private final JComboBox<Activity> filterComboBox;
-        private final JButton filterButton;
-        private final JButton showAllButton;
 
         setLayout(new FlowLayout(FlowLayout.LEFT));
 
@@ -25,7 +24,6 @@ public class FilterAndResetPanel extends JPanel {
         showAllButton = new JButton("Show All");
         add(showAllButton);
     }
-
 
     public JComboBox<Activity> getFilterComboBox() {
         return filterComboBox;

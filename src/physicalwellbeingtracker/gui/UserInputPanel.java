@@ -15,15 +15,12 @@ public class UserInputPanel extends JPanel {
     private final JComboBox<String> monthComboBox;
     private final JComboBox<Integer> yearComboBox;
 
-
     public UserInputPanel() {
-        setLayout(new GridLayout(4, 4)); // Adjust layout as needed
+        setLayout(new GridLayout(4, 4));
 
         add(new JLabel("Duration (hour):"));
         durationField = new JTextField();
         add(durationField);
-
-
 
         add(new JLabel("Activity:"));
         activityJComboBox = new JComboBox<>(Activity.values());
@@ -34,22 +31,19 @@ public class UserInputPanel extends JPanel {
         add(intensityJComboBox);
 
         add(new JLabel("Date:"));
-        // Day, month, and year combo boxes
         dayComboBox = new JComboBox<>(IntStream.rangeClosed(1, 31).boxed().toArray(Integer[]::new));
-        monthComboBox = new JComboBox<>(new String[]{"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"});
+        monthComboBox = new JComboBox<>(new String[]{
+                "January", "February", "March", "April", "May", "June",
+                "July", "August", "September", "October", "November", "December"
+        });
         yearComboBox = new JComboBox<>(IntStream.rangeClosed(1900, 2100).boxed().toArray(Integer[]::new));
+
         JPanel datePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         datePanel.add(dayComboBox);
         datePanel.add(monthComboBox);
         datePanel.add(yearComboBox);
         add(datePanel);
-
-
-
     }
-
-
-
 
     public double getDuration() {
         try {
@@ -62,19 +56,17 @@ public class UserInputPanel extends JPanel {
     public Activity getActivity() {
         return (Activity) activityJComboBox.getSelectedItem();
     }
+
     public Intensity getIntensity() {
         return (Intensity) intensityJComboBox.getSelectedItem();
     }
 
     public LocalDate getDate() {
-        // Construct and return a LocalDate object from the date components
-        // with dayComboBox, monthComboBox, yearComboBox
         Integer day = (Integer) dayComboBox.getSelectedItem();
-        int month = monthComboBox.getSelectedIndex();
+        int month = monthComboBox.getSelectedIndex() + 1;
         Integer year = (Integer) yearComboBox.getSelectedItem();
 
         if (day == null || year == null) {
-            // Handle the case where day or year is null as they are objects ,
             return null;
         }
 
